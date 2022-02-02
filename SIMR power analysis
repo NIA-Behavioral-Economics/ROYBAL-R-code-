@@ -22,6 +22,7 @@
 #load packages 
 library(dplyr)
 library(simr)
+library(parallel)
 
 #function 
 sim <- function(c, m, pr, avg, b0, b1, b2, b3, b4, b5, b6, r1, r2, no_sim) {
@@ -121,4 +122,18 @@ return(list(power_simr_nz, errors, warnings))
 
 }
 
-sim(50, 8, 0.99, 36, 0, 0, 0, 0, 0, -.02, -.02, 0.5, 1, 100)
+#with parallelization 
+#clinic levels 
+clinic_no <- c(10, 20, 30, 40)
+
+#number of cores
+no_cores <- detectCores() - 4
+
+#parallelization 
+clust <- makeCluster(no_cores, type = "FORK")
+
+#results 
+res <- parLapply(clust, clinic_no, sim, 8, 36, 0, 0, 0, 0, 0, -.05, -.05, 0.55, 1, 200)})
+
+#shut down cluster
+stopCluster(clust)
